@@ -20,6 +20,10 @@ def main():
             logging.info(client.log_prefix + " ".join(f"{k}: {v} |" for k, v in client.stats.items()))
             sleep(0.5)
             print(' ')
+        total_salary = 0
+        for client in clients:
+            total_salary += client.state['earnPassivePerHour']
+        print("Общий пасивный доход: " + str(total_salary))
         print('-' * 120)
         sleep(60)
 

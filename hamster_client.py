@@ -233,6 +233,8 @@ class HamsterClient(Session, TimestampMixin, CardSorterMixin):
                 self.upgrades_list()
                 if sorted_upgrades := self.get_sorted_upgrades(self.features['buy_decision_method']):
                     upgrade = sorted_upgrades[0]
+                    if self.balance - upgrade['price'] < self.features['min_balance']:
+                        break
                     if upgrade['price'] <= self.balance:
                         result = self.upgrade_card(upgrade['id'])
                         if result.status_code == HTTPStatus.OK:
