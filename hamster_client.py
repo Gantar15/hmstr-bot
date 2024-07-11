@@ -7,7 +7,7 @@ from typing import Dict, Union
 
 from requests import Response, Session
 
-from config import HEADERS, MORSE_CODE_DICT
+from config import HEADERS, MORSE_CODE_DICT, COMBO_CARDS
 from enums import MessageEnum, UrlsEnum
 from mixins import TimestampMixin, CardSorterMixin
 
@@ -227,7 +227,7 @@ class HamsterClient(Session, TimestampMixin, CardSorterMixin):
         return []
 
     def buy_upgrades(self) -> None:
-        """ Покупаем лучшие апгрейды на все монеты """
+        """ Покупаем лучшие апгрейды """
         if self.features['buy_upgrades']:
             while True:
                 self.upgrades_list()
@@ -247,6 +247,51 @@ class HamsterClient(Session, TimestampMixin, CardSorterMixin):
                     break
         else:
             self.upgrades_list()
+
+    def buy_combo(self) -> None:
+        """ Покупаем комбо апгрейды """
+        if not self.features['buy_combo']:
+            return
+        self.upgrades_list()
+
+        combo = self.upgrades.get('dailyCombo', {})
+        combo_upgrades = combo.get('upgradeIds', [])
+
+        prepared = []
+        for upgrade in self.upgrades.get("upgradesForBuy"):
+            if (
+                upgrade["isAvailable"]
+                and not upgrade['id'] in combo_upgrades
+                and not upgrade["isExpired"]
+                and upgrade["profitPerHourDelta"] > 0
+                and not upgrade.get("cooldownSeconds")
+            ):
+                item = upgrade.copy()
+                if 'condition' in item:
+                    item.pop('condition')
+                prepared.append(item)        
+        if prepared:
+            general_combo_price = 0
+            upgrades = []
+            cards = []
+            for combo_card_name in COMBO_CARDS:
+                upgrade = None
+                for upgradeItem in prepared:
+                    if upgradeItem['id'] == combo_card_name:
+                        upgrade = upgradeItem
+                if upgrade:
+                    upgrades.append(upgrade)
+                    general_combo_price += upgrade['price']
+            for upgrade in upgrades:
+                if (upgrade 
+                    and self.balance - general_combo_price >= self.features['min_balance']
+                    and general_combo_price < 5000000
+                ):
+                    cards.append(upgrade['id'])
+                    self.upgrade_card(upgrade['id'])
+            if cards:
+                logging.info(self.log_prefix + MessageEnum.MSG_PURCHASED_COMBO_CARDS.format(cards=' '.join(cards)))
+                self.upgrades_list()
 
     def claim_combo_reward(self) -> None:
         """ Получаем награду, если собрано комбо """

@@ -15,6 +15,8 @@ HEADERS = {
     "Accept-Encoding": "gzip, deflate",
 }
 
+COMBO_CARDS = ['vesting_smartcontracts', 'medium', 'hamster_youtube_gold_button']
+
 MORSE_CODE_DICT = {
     'A': '.-',
     'B': '-...',

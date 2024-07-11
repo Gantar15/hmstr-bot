@@ -24,6 +24,7 @@ class MessageEnum(StrEnum):
     MSG_COMBO_EARNED = "Получено вознаграждение за комбо: {coins}"
     MSG_BAD_RESPONSE = "Плохой ответ от сервера: {status} {text}"
     MSG_CLAIMED_COMBO_CARDS = "Полученные комбо карты: {cards}"
+    MSG_PURCHASED_COMBO_CARDS = "Купил комбо карты: {cards}"
     MSG_CRYPTED_CIPHER = "Шифрованный шифр: {cipher}"
     MSG_TAP = "Тапнул на {taps_count} монет"
     MSG_CIPHER = "Новый шифр: {cipher}"

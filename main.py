@@ -12,6 +12,7 @@ def main():
             client.sync()
             client.claim_daily_cipher()
             client.tap()
+            client.buy_combo()
             client.buy_upgrades()
             client.check_task()
             client.claim_combo_reward()
